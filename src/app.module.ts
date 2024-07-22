@@ -39,7 +39,7 @@ import { HashService } from './hash/hash.service';
       inject: [PinoLogger],
     }),
     LoggerModule.forRoot(pinoConfig),
-    UsersModule,
+    // UsersModule,
     // AuthModule,
     // ChatModule,
     // ProductModule,
