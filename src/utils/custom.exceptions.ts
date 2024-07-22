@@ -3,17 +3,17 @@ import { serviceCode } from './constant';
 
 export class ErrorException extends HttpException {
   constructor(
-    { httpStatus = '500', caseCode, message },
+    { caseCode, message },
     additionalMessage = '',
   ) {
     super(
       {
-        responseCode: httpStatus + serviceCode + caseCode,
+        responseCode: '500' + serviceCode + caseCode,
         responseDesc: `${message}${
           additionalMessage ? `: ${additionalMessage}` : ''
         }`,
       },
-      httpStatus,
+      '500',
     );
   }
 }
