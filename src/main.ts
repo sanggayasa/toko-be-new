@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.disable('x-powered-by');
-  app.use(helmet());
+  // app.disable('x-powered-by');
+  // app.use(helmet());
   app.enableCors({
     origin: ['*', 'https://toko-peach.vercel.app','https://vercel.app','toko-peach.vercel.app', 'vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
