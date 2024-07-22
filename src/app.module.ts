@@ -40,7 +40,7 @@ import { HashService } from './hash/hash.service';
     }),
     LoggerModule.forRoot(pinoConfig),
     // UsersModule,
-    AuthModule,
+    // AuthModule,
     // ChatModule,
     // ProductModule,
     // CartModule,
