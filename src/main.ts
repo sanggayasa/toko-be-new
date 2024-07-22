@@ -6,10 +6,11 @@ async function bootstrap() {
   // app.disable('x-powered-by');
   // app.use(helmet());
   app.enableCors({
-    origin: ['https://toko-peach.vercel.app','https://vercel.app','toko-peach.vercel.app', 'vercel.app'],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept',
     credentials: true,
+    preflightContinue: false,
   });
   await app.listen(3000);
 }
