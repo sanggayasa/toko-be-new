@@ -8,6 +8,7 @@ async function bootstrap() {
       'https://toko-peach.vercel.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept',
     credentials: true,
   });
   await app.listen(3000);
