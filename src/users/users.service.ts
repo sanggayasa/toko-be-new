@@ -9,7 +9,7 @@ import {
   Pagination,
   paginate,
 } from 'nestjs-typeorm-paginate';
-// import { ErrorException } from 'src/utils/custom.exceptions';
+import { ErrorException } from 'src/utils/custom.exceptions';
 @Injectable()
 export class UsersService {
   constructor(
@@ -40,11 +40,11 @@ export class UsersService {
     };
 
     if (checkDuplicateEmail.length > 0) {
-      // throw new ErrorException(mapDucplicate('Email sudah terdaftar'));
+      throw new ErrorException(mapDucplicate('Email sudah terdaftar'));
     }
 
     if (checkDuplicatePhone.length > 0) {
-      // throw new ErrorException(mapDucplicate('Phone sudah terdaftar'));
+      throw new ErrorException(mapDucplicate('Phone sudah terdaftar'));
     }
 
     const password = createUserDto.password;

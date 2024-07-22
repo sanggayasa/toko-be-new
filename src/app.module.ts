@@ -11,6 +11,7 @@ import { pinoConfig } from './config/logger.config';
 import { DataSource } from 'typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { ErrorException } from './utils/custom.exceptions';
 // import { PusherService } from './pusher/pusher.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './utils/interceptors/response.interceptor';
@@ -41,6 +42,7 @@ import { HashService } from './hash/hash.service';
     LoggerModule.forRoot(pinoConfig),
     UsersModule,
     AuthModule,
+    ErrorException,
     // ChatModule,
     // ProductModule,
     // CartModule,
