@@ -22,7 +22,7 @@ import {
 // import { ListProduct } from './entities/list-product.entity';
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ErrorException } from '../utils/custom.exceptions';
+// import { ErrorException } from '../utils/custom.exceptions';
 import { responseMessage } from '../utils/constant';
 // import { Prod } from '../users/users.service';
 // import { ProductImageService } from '../product-image/product-image.service';
@@ -143,7 +143,7 @@ export class ProductService {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      throw new ErrorException(responseMessage.NOT_FOUND);
+      // throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     return await this.productRepository.update(id, {
@@ -189,7 +189,7 @@ export class ProductService {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      throw new ErrorException(responseMessage.NOT_FOUND);
+      // throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     await this.productRepository.update(id, {
