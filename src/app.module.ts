@@ -42,7 +42,7 @@ import { HashService } from './hash/hash.service';
     UsersModule,
     AuthModule,
     ChatModule,
-    ProductModule,
+    // ProductModule,
     CartModule,
     CategoryModule,
     PaymentModule,
