@@ -45,7 +45,7 @@ import { HashService } from './hash/hash.service';
     // ChatModule,
     ProductModule,
     // CartModule,
-    // CategoryModule,
+    CategoryModule,
     // PaymentModule,
     // ProductImageModule,
     // ProductFilesModule,
