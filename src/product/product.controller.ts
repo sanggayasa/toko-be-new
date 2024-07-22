@@ -94,11 +94,11 @@ export class ProductController {
     return this.productService.remove(id);
   }
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return file;
-  }
+  // @Post('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  // uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   return file;
+  // }
 
   @Delete('delete')
   async uploadImage(@Body() imageProduct: ImageProductDto) {
