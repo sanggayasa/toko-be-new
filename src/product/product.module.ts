@@ -13,7 +13,7 @@ import { diskStorage } from 'multer';
     // TypeOrmModule.forFeature([ListProduct]),
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads', // Adjust the directory path for uploads
+        // destination: './uploads', // Adjust the directory path for uploads
         filename: function (req, file, cb) {
           // const uniqueSuffix =
           //   Date.now() + '-' + Math.round(Math.random() * 1e9);
