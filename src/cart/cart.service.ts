@@ -5,7 +5,7 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateCartDto } from './dto/update-cart.dto';
-// import { ErrorException } from 'src/utils/custom.exceptions';
+import { ErrorException } from '../../src/utils/custom.exceptions';
 import { responseMessage } from 'src/utils/constant';
 @Injectable()
 export class CartService {
@@ -59,7 +59,7 @@ export class CartService {
     const checkIsDataExist = await this.cartRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     return await this.cartRepository.update(id, {
@@ -90,7 +90,7 @@ export class CartService {
     const checkIsDataExist = await this.cartRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     await this.cartRepository.update(id, {

@@ -165,9 +165,6 @@ export class ProductService {
 
     if (!checkIsDataExist) {
       throw new ErrorException(responseMessage.NOT_FOUND);
-      // return {
-      //   message: 'data not found',
-      // };
     }
 
     return await this.productRepository.update(id, {
@@ -198,13 +195,12 @@ export class ProductService {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     await this.productRepository.update(id, {
       updated_by: 'sangga',
     });
     return await this.productRepository.softDelete({ id });
-    // return true;
   }
 }

@@ -5,7 +5,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { Category } from './entities/category.entity';
 import { unlink as unlinkAsync } from 'fs';
 // import { UpdateCategoryDto } from './dto/update-category.dto';
-// import { ErrorException } from '../utils/custom.exceptions';
+import { ErrorException } from '../utils/custom.exceptions';
 import { responseMessage } from '../utils/constant';
 @Injectable()
 export class CategoryService {
@@ -47,7 +47,7 @@ export class CategoryService {
     const checkIsDataExist = await this.categoryRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     return await this.categoryRepository.update(id, {
@@ -76,7 +76,7 @@ export class CategoryService {
     const checkIsDataExist = await this.categoryRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
     await this.categoryRepository.update(id, {
