@@ -164,10 +164,10 @@ export class ProductService {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
-      return {
-        message: 'data not found',
-      };
+      throw new ErrorException(responseMessage.NOT_FOUND);
+      // return {
+      //   message: 'data not found',
+      // };
     }
 
     return await this.productRepository.update(id, {
