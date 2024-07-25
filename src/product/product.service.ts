@@ -22,8 +22,8 @@ import {
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductImage } from './entities/product-image.entity';
-import { ErrorException } from 'src/utils/custom.exceptions';
-import { responseMessage } from 'src/utils/constant';
+import { ErrorException } from '../../src/utils/custom.exceptions';
+import { responseMessage } from '../../src/utils/constant';
 
 @Injectable()
 export class ProductService {
