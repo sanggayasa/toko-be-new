@@ -16,9 +16,9 @@ const postgreSQLConfig: TypeOrmModuleOptions = {
   extra: {
     connectionLimit: process.env.NEST_PUBLIC_POSTGRES_CONNECTION_LIMIT,
   },
-  // ssl: {
-  //   rejectUnauthorized: false,
-  // },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 export { postgreSQLConfig };
