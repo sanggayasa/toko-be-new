@@ -19,22 +19,19 @@ import {
   Pagination,
   paginate,
 } from 'nestjs-typeorm-paginate';
-// import { ListProduct } from './entities/list-product.entity';
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateProductDto } from './dto/update-product.dto';
-// import { ErrorException } from '../utils/custom.exceptions';
-import { responseMessage } from '../utils/constant';
-// import { Prod } from '../users/users.service';
-// import { ProductImageService } from '../product-image/product-image.service';
-// import { getImage } from '../utils/function'
+import { ProductImage } from './entities/product-image.entity';
+import { ErrorException } from 'src/utils/custom.exceptions';
+import { responseMessage } from 'src/utils/constant';
+
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    // @InjectRepository(ListProduct)
-    // private readonly detailProductRepository: Repository<ListProduct>,
-    // private productImageService: ProductImageService,
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>,
   ) {}
 
   private context: string = 'product';
@@ -42,10 +39,19 @@ export class ProductService {
   async paginate(options: IPaginationOptions): Promise<Pagination<Product>> {
     return paginate<Product>(this.productRepository, options);
   }
-  async create(createProductDto: CreateProductDto) {
-    return await this.productRepository.insert({
+  async create(createProductDto: CreateProductDto, image: any) {
+    const idProduct = await this.productRepository.insert({
       ...createProductDto,
     });
+
+    image.map(async (item) => {
+      await this.productImageRepository.insert({
+        product_id: idProduct.identifiers[0].id,
+        url: item,
+      });
+    });
+
+    return idProduct;
   }
 
   async findBy(
@@ -59,8 +65,6 @@ export class ProductService {
     priceMin,
     priceMax,
   ) {
-    // const productImage = await this.productImageService.getImage(username);
-    // let price: any;
     if (!price) {
       price = null;
     }
@@ -77,12 +81,7 @@ export class ProductService {
     if (discount) {
       discount = MoreThanOrEqual(discount);
     }
-    // try {
-    // const page: number = 1;
-    // const limit: number = 10;
-    console.log('page', page);
-    console.log('price', price);
-    const data = await paginate(
+    const productList = await paginate(
       this.productRepository,
       { page, limit },
       {
@@ -92,77 +91,87 @@ export class ProductService {
             price: price,
             description: ILike(`%${description}%`),
           },
-          // {
-          //   discount: discount,
-          // },
         ],
-        select: ['title', 'description', 'images', 'id', 'price'],
+        select: ['title', 'description', 'id', 'price'],
         relations: ['category'],
-        // order: { created_at: 'DESC' },
       },
     );
 
-    // const data = await this.productRepository.find({
-    //   where: [
-    //     {
-    //       title: ILike(`%${createProductDto.title}%`),
-    //       price: price,
-    //       description: ILike(`%${createProductDto.description}%`),
-    //     },
-    //     {
-    //       discount: discount,
-    //     },
-    //   ],
-    //   select: ['title', 'description', 'images', 'id', 'price'],
-    //   relations: ['category'],
-    // });
-    console.log();
-    if (!data) {
+    if (!productList) {
       throw new NotFoundException(this.context);
     }
 
-    return data;
-    // } catch (err) {
-    //   console.log('err', err);
-    // }
+    const productWithGambar = await Promise.all(
+      productList.items.map(async (item) => {
+        const images = await this.productImageRepository.find({
+          select: ['url'],
+          where: { product_id: item.id },
+        });
+
+        if (!images) {
+          throw new NotFoundException(this.context);
+        }
+        console.log('imagesssss', images);
+        return {
+          ...item,
+          images: images,
+          category: {
+            name: item.category.name,
+            id: item.category.id,
+          },
+        };
+      }),
+    );
+    const remapListProduct = {
+      ...productList,
+      items: productWithGambar,
+    };
+
+    return remapListProduct;
   }
 
   async findOne(id: string) {
     const data = await this.productRepository.findOne({
       where: { id },
+      relations: ['category'],
     });
-
     if (!data) {
       throw new NotFoundException(this.context);
     }
 
-    return data;
+    const images = await this.productImageRepository.find({
+      select: ['url'],
+      where: { product_id: id },
+    });
+
+    if (!images) {
+      throw new NotFoundException(this.context);
+    }
+
+    const detailProduct = {
+      ...data,
+      images: images,
+      category: {
+        name: data.category.name,
+        id: data.category.id,
+      }
+    };
+    // data.images = images;
+    return detailProduct;
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
-      // throw new ErrorException(responseMessage.NOT_FOUND);
+      throw new ErrorException(responseMessage.NOT_FOUND);
+      // return {
+      //   message: 'data not found',
+      // };
     }
 
     return await this.productRepository.update(id, {
       ...updateProductDto,
-    });
-  }
-
-  async updateImage(id: string, fileName: string) {
-    console.log('jaln inii');
-    const getImage = await this.productRepository.findOne({
-      where: { id },
-    });
-
-    console.log(getImage.images);
-    return await this.productRepository.update(id, {
-      // ...createProductDto,
-      // id: id,
-      // name: fileName,
-      images: [fileName],
     });
   }
 

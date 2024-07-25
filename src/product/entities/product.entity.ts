@@ -1,18 +1,14 @@
 import { Category } from 'src/category/entities/category.entity';
 import { GlobalEntity } from 'src/global.entity';
-// import { ProductImage } from 'src/product-image/entities/product-image.entity';
 import {
   Column,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  // ManyToOne,
-  // OneToOne,
-  // JoinColumn,
-  // ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-// import { Category } from 'src/category/entities/category.entity';
+import { ProductImage } from './product-image.entity';
 @Entity('product')
 export class Product extends GlobalEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -27,9 +23,6 @@ export class Product extends GlobalEntity {
   @Column({ type: 'uuid' })
   category_id: string;
 
-  // @Column({ type: 'uuid' })
-  // tesidId: string;
-
   @Column({ type: 'integer' })
   price: number;
 
@@ -42,15 +35,10 @@ export class Product extends GlobalEntity {
   @Column({ type: 'integer' })
   weight: number;
 
-  @Column({ type: 'jsonb' })
-  images: string[];
-
   @ManyToOne(() => Category, (category) => category.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  // @ManyToOne(() => Category, (category) => category.products, {
-  //   onDelete: 'SET NULL',
-  // })
-  // tesid: Category;
+  // @OneToMany(() => ProductImage, (image) => image.product_id)
+  // images: ProductImage[];
 }

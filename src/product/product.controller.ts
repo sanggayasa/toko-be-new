@@ -5,7 +5,7 @@ import {
   Get,
   Delete,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
   ParseUUIDPipe,
   Param,
   Put,
@@ -17,20 +17,13 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductService } from './product.service';
 import { ResponseMessage } from 'src/utils/decorator/response.decorator';
 import { responseMessage } from 'src/utils/constant';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImageProductDto } from './dto/image-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-// import { title } from 'process';
-// import { Category } from 'src/category/entities/category.entity';
+import { v2 as cloudinary } from 'cloudinary';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
-  @Post()
-  @ResponseMessage(responseMessage.SUCCESSFULLY_CREATED)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
-  }
-
   @Get('all')
   async findByFilter(
     // @Body() createProductDto: CreateProductDto,
@@ -59,18 +52,18 @@ export class ProductController {
       priceMin,
       priceMax,
     );
-
-    return {
-      ...resultProduct,
-      items: resultProduct.items.map((product) => ({
-        id: product.id,
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        image: product.images[0],
-        category_name: product.category.name,
-      })),
-    };
+    return resultProduct;
+    // return {
+    //   ...resultProduct,
+    //   items: resultProduct.items.map((product) => ({
+    //     id: product.id,
+    //     title: product.title,
+    //     description: product.description,
+    //     price: product.price,
+    //     // image: product.images[0],
+    //     category_name: product.category.name,
+    //   })),
+    // };
   }
 
   @Get(':id')
@@ -95,9 +88,36 @@ export class ProductController {
   }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return file;
+  @UseInterceptors(FilesInterceptor('file', 2))
+  async uploadFile(
+    @UploadedFiles() file: Array<Express.Multer.File>,
+    @Body() createProductDto: CreateProductDto,
+  ) {
+    cloudinary.config({
+      cloud_name: 'dbuvg7afe',
+      api_key: '332531932338268',
+      api_secret: 'B31KYmBvsslVaNhwOKwbBUAakjk', // Click 'View Credentials' below to copy your API secret
+    });
+
+    // Upload an image
+    const uploadImages = file.map(async (itemFoto) => {
+      console.log('jalan');
+      const uploadResult = cloudinary.uploader
+        .upload(itemFoto.path, {
+          public_id: 'product-' + itemFoto.originalname,
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      return uploadResult;
+    });
+
+    const detailImages = await Promise.all(uploadImages);
+    const urlImages = detailImages.map((items: any) => {
+      return items.secure_url;
+    });
+
+    return this.productService.create(createProductDto, urlImages);
   }
 
   @Delete('delete')
