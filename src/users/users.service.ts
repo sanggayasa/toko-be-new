@@ -9,7 +9,7 @@ import {
   Pagination,
   paginate,
 } from 'nestjs-typeorm-paginate';
-import { ErrorException } from '../../src/utils/custom.exceptions';
+import { ErrorException } from '../utils/custom.exceptions';
 @Injectable()
 export class UsersService {
   constructor(

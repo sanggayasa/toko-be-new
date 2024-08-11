@@ -25,4 +25,7 @@ export class Cart extends GlobalEntity {
 
   @Column({ type: 'varchar', length: 255 })
   description: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  url_image: string;
 }

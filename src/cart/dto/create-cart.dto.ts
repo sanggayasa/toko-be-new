@@ -52,4 +52,8 @@ export class CreateCartDto {
   @IsNotEmpty()
   @IsString()
   description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  url_image: string;
 }

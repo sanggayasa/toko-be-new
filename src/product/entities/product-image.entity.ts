@@ -10,4 +10,7 @@ export class ProductImage extends GlobalEntity {
 
   @Column({ type: 'varchar', length: 255 })
   url: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  id_image: string;
 }

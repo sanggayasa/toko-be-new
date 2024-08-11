@@ -20,7 +20,7 @@ import { responseMessage } from 'src/utils/constant';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImageProductDto } from './dto/image-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -72,13 +72,65 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
-  @Put(':id')
+  @Put('update/:id')
+  @UseInterceptors(FilesInterceptor('file', 5))
   @ResponseMessage(responseMessage.SUCCESS_UPDATE)
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() file: Array<Express.Multer.File>,
   ) {
-    return this.productService.update(id, updateProductDto);
+    let updateImageCloud = [];
+    if (file.length > 0) {
+      const images = JSON.parse(updateProductDto.images);
+      cloudinary.config({
+        cloud_name: process.env.NEST_PUBLIC_CLOUD_NAME,
+        api_key: process.env.NEST_PUBLIC_CLOUD_APIKEY,
+        api_secret: process.env.NEST_PUBLIC_CLOUD_SECRET, // Click 'View Credentials' below to copy your API secret
+      });
+      console.log(file);
+      const responseImages = images.map(async (item) => {
+        await cloudinary.uploader.destroy(item.id_image_cloud);
+
+        // if(item.name === file.name){
+
+        // }
+        // Upload an image
+        const uploadImages = file.map(async (itemFoto) => {
+          if (itemFoto.originalname === item.name) {
+            console.log(itemFoto.originalname, item.name);
+            const uploadResult = cloudinary.uploader
+              .upload(itemFoto.path, {
+                public_id:
+                  'product-' + new Date().getTime() + itemFoto.originalname,
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            return uploadResult;
+          }
+        });
+
+        const detailImages = await Promise.all(uploadImages);
+        const filterImages = detailImages.filter(
+          (image) => image !== undefined,
+        );
+        console.log('filter imagessss,', filterImages);
+        // const urlImages = (filterImages[0] as UploadApiResponse).secure_url;
+
+        return {
+          ...item,
+          url: (filterImages[0] as UploadApiResponse).secure_url,
+          id_image_cloud: (filterImages[0] as UploadApiResponse).public_id,
+        };
+      });
+
+      console.log('responseImages', await Promise.all(responseImages));
+      updateImageCloud = await Promise.all(responseImages);
+    }
+    // console.log('updateedddd', updateImageCloud);
+    delete updateProductDto.images;
+    return this.productService.update(id, updateProductDto, updateImageCloud);
   }
 
   @Delete(':id')
@@ -88,23 +140,24 @@ export class ProductController {
   }
 
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('file', 2))
+  @UseInterceptors(FilesInterceptor('file', 5))
   async uploadFile(
     @UploadedFiles() file: Array<Express.Multer.File>,
     @Body() createProductDto: CreateProductDto,
   ) {
+    console.log(createProductDto);
+    // return true;
     cloudinary.config({
-      cloud_name: 'dbuvg7afe',
-      api_key: '332531932338268',
-      api_secret: 'B31KYmBvsslVaNhwOKwbBUAakjk', // Click 'View Credentials' below to copy your API secret
+      cloud_name: process.env.NEST_PUBLIC_CLOUD_NAME,
+      api_key: process.env.NEST_PUBLIC_CLOUD_APIKEY,
+      api_secret: process.env.NEST_PUBLIC_CLOUD_SECRET, // Click 'View Credentials' below to copy your API secret
     });
 
     // Upload an image
     const uploadImages = file.map(async (itemFoto) => {
-      console.log('jalan');
       const uploadResult = cloudinary.uploader
         .upload(itemFoto.path, {
-          public_id: 'product-' + itemFoto.originalname,
+          public_id: 'product-' + new Date().getTime() + itemFoto.originalname,
         })
         .catch((error) => {
           console.log(error);
@@ -113,8 +166,12 @@ export class ProductController {
     });
 
     const detailImages = await Promise.all(uploadImages);
+    console.log(detailImages);
     const urlImages = detailImages.map((items: any) => {
-      return items.secure_url;
+      return {
+        id: items.public_id,
+        url: items.secure_url,
+      };
     });
 
     return this.productService.create(createProductDto, urlImages);

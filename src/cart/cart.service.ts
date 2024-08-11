@@ -5,7 +5,7 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateCartDto } from './dto/update-cart.dto';
-import { ErrorException } from '../../src/utils/custom.exceptions';
+import { ErrorException } from '../utils/custom.exceptions';
 import { responseMessage } from 'src/utils/constant';
 @Injectable()
 export class CartService {
@@ -23,9 +23,9 @@ export class CartService {
     });
 
     if (checkDuplicateProduct.length > 0) {
-      return 'success';
+      return 'data duplicate';
     }
-
+    console.log("====", createCartDto.url_image)
     return await this.cartRepository.insert({
       ...createCartDto,
     });

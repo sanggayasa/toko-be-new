@@ -22,8 +22,8 @@ import {
 import { unlink as unlinkAsync } from 'fs';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductImage } from './entities/product-image.entity';
-import { ErrorException } from '../../src/utils/custom.exceptions';
-import { responseMessage } from '../../src/utils/constant';
+import { ErrorException } from '../utils/custom.exceptions';
+import { responseMessage } from '../utils/constant';
 
 @Injectable()
 export class ProductService {
@@ -44,11 +44,14 @@ export class ProductService {
       ...createProductDto,
     });
 
+    console.log('imagesss', image);
     image.map(async (item) => {
-      await this.productImageRepository.insert({
+      const resultTableIamge = await this.productImageRepository.insert({
         product_id: idProduct.identifiers[0].id,
-        url: item,
+        url: item.url,
+        id_image: item.id,
       });
+      console.log('ress', resultTableIamge);
     });
 
     return idProduct;
@@ -140,7 +143,7 @@ export class ProductService {
     }
 
     const images = await this.productImageRepository.find({
-      select: ['url'],
+      select: ['url', 'id_image', 'id'],
       where: { product_id: id },
     });
 
@@ -154,19 +157,43 @@ export class ProductService {
       category: {
         name: data.category.name,
         id: data.category.id,
-      }
+      },
     };
     // data.images = images;
     return detailProduct;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+    updateImage: any,
+  ) {
     const checkIsDataExist = await this.productRepository.findOneBy({ id });
 
     if (!checkIsDataExist) {
       throw new ErrorException(responseMessage.NOT_FOUND);
     }
 
+    if (updateImage.length > 0) {
+      updateImage.map(async (item) => {
+        const checkIsDataImageExist =
+          await this.productImageRepository.findOneBy({
+            id: item.id_image_db,
+          });
+
+        if (!checkIsDataImageExist) {
+          throw new ErrorException(responseMessage.NOT_FOUND);
+        }
+
+        await this.productImageRepository.update(item.id_image_db, {
+          id: item.id_image_db,
+          url: item.url,
+          id_image: item.id_image_cloud,
+        });
+      });
+    }
+    // return true
+    console.log('detail data', updateProductDto);
     return await this.productRepository.update(id, {
       ...updateProductDto,
     });
@@ -201,6 +228,8 @@ export class ProductService {
     await this.productRepository.update(id, {
       updated_by: 'sangga',
     });
+
+    await this.productImageRepository.softDelete({ product_id: id });
     return await this.productRepository.softDelete({ id });
   }
 }

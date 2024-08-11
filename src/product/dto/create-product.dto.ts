@@ -73,5 +73,5 @@ export class CreateProductDto {
   @IsOptional()
   @IsArray()
   // @ArrayNotEmpty()
-  images: string[];
+  images: string;
 }
