@@ -17,7 +17,9 @@ import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { CartModule } from './cart/cart.module';
 import { PaymentModule } from './payment/payment.module';
+import { ChatModule } from './chat/chat.module';
 import { HashService } from './hash/hash.service';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { HashService } from './hash/hash.service';
     CartModule,
     CategoryModule,
     PaymentModule,
+    ChatModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [
